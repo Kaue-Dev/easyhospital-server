@@ -12,7 +12,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "sua-senha",
+  password: "kaue2004",
   database: "easyhospital",
 });
 
@@ -158,6 +158,91 @@ app.post("/api/consultas", (req, res) => {
       return res.status(500).json({ message: "Erro ao agendar a consulta" });
     }
     res.status(201).json({ message: "Consulta agendada com sucesso!", consultaId: result.insertId });
+  });
+});
+
+// Endpoint para deletar uma consulta
+app.delete("/api/consultas/:id", (req, res) => {
+  const consultaId = req.params.id;
+
+  const query = "DELETE FROM consultas WHERE id = ?";
+  
+  db.query(query, [consultaId], (err, result) => {
+    if (err) {
+      console.error("Erro ao deletar a consulta:", err);
+      return res.status(500).json({ message: "Erro ao deletar a consulta" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Consulta não encontrada" });
+    }
+
+    res.status(200).json({ message: "Consulta deletada com sucesso" });
+  });
+});
+
+// Endpoint para deletar um paciente pelo ID
+app.delete("/api/pacientes/:id", (req, res) => {
+  const pacienteId = req.params.id;
+
+  const query = "DELETE FROM paciente WHERE id = ?";
+  
+  db.query(query, [pacienteId], (err, result) => {
+    if (err) {
+      console.error("Erro ao deletar o paciente:", err);
+      return res.status(500).json({ message: "Erro ao deletar o paciente" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Paciente não encontrado" });
+    }
+
+    res.status(200).json({ message: "Paciente deletado com sucesso" });
+  });
+});
+
+// Endpoint para deletar um médico pelo ID
+app.delete("/api/medicos/:id", (req, res) => {
+  const medicoId = req.params.id;
+
+  const query = "DELETE FROM medico WHERE id = ?";
+
+  db.query(query, [medicoId], (err, result) => {
+    if (err) {
+      console.error("Erro ao deletar o médico:", err);
+      return res.status(500).json({ message: "Erro ao deletar o médico" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Médico não encontrado" });
+    }
+
+    res.status(200).json({ message: "Médico deletado com sucesso" });
+  });
+});
+
+// Endpoint para atualizar a data/hora de uma consulta
+app.put("/api/consultas/:id", (req, res) => {
+  const consultaId = req.params.id;
+  const { data_hora } = req.body;
+
+  if (!data_hora) {
+    return res.status(400).json({ message: "O campo data_hora é obrigatório." });
+  }
+
+  const query = "UPDATE consultas SET data_hora = ? WHERE id = ?";
+
+  db.query(query, [data_hora, consultaId], (err, result) => {
+    if (err) {
+      console.error("Erro ao atualizar a data/hora da consulta:", err);
+      return res.status(500).json({ message: "Erro ao atualizar a consulta" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Consulta não encontrada" });
+    }
+
+    res.status(200).json({ message: "Data/hora da consulta atualizada com sucesso" });
   });
 });
 
